@@ -1,0 +1,11 @@
+commit 4d36c48b08cddfe001aab3dbe7899c1032c30b45
+Author: TagawaHirotaka <mariobaske@i.softbank.jp>
+Date:   Fri Mar 12 03:39:16 2021 +0900
+
+    Change Blob to File in file_modal.ts (#2098)
+    
+    * Change Blob to File
+    
+    * Rename BlobArrayResolver to FileArrayResolver
+    
+    * Change Blob to File
