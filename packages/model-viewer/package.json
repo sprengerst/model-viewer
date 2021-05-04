@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist",
-    "prepare": "if [ ! -L './shared-assets' ]; then ln -s ./node_modules/@google/model-viewer-shared-assets ./shared-assets; fi",
+    "prepare": "",
     "build": "npm run build:tsc && npm run build:rollup",
     "build:dev": "npm run build:tsc && npm run build:rollup:dev",
     "build:tsc": "tsc --incremental",

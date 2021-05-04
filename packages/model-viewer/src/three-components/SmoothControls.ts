@@ -517,12 +517,34 @@ export class SmoothControls extends EventDispatcher {
             const dx = Math.abs(clientX - this.lastPointerPosition.clientX);
             const dy = Math.abs(clientY - this.lastPointerPosition.clientY);
             // If motion is mostly vertical, assume scrolling is the intent.
+
+            const isMobile =
+                /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+              // console.warn('dx (dx))', dx);
+              // console.warn('dy (dy))', dy);
+
+              if (dy > dx && dy > 10) {
+                // console.warn('dy > dx && dy > 8');
+                this.touchMode = 'scroll';
+                return;
+              } else {
+                this.touchMode = 'rotate';
+              }
+            }
+
             if ((touchAction === 'pan-y' && dy > dx) ||
                 (touchAction === 'pan-x' && dx > dy)) {
               this.touchMode = 'scroll';
               return;
             }
           }
+
+          // console.warn('Pass Event A (this.touchDecided)',
+          // this.touchDecided); console.warn('Pass Event A (touchAction)',
+          // touchAction);
+
           this.handleSinglePointerMove(touches[0]);
           break;
         case 'scroll':
@@ -531,12 +553,14 @@ export class SmoothControls extends EventDispatcher {
 
       this.lastTouches = touches;
     } else {
+      console.warn('Pass Event B');
+
       this.handleSinglePointerMove(event as MouseEvent);
     }
 
     if (event.cancelable) {
       event.preventDefault();
-    };
+    }
   };
 
   private handleSinglePointerMove(pointer: Pointer) {
@@ -600,6 +624,22 @@ export class SmoothControls extends EventDispatcher {
 
   private onWheel = (event: Event) => {
     if (!this.canInteract) {
+      return;
+    }
+
+    const wheelEvent = (event as WheelEvent);
+    console.log(
+        'Math.abs((event as WheelEvent).deltaY)', Math.abs(wheelEvent.deltaY));
+    console.log('Prevent Scrolling (e.ctrlkey)', wheelEvent.ctrlKey);
+
+    if (Math.abs(wheelEvent.deltaY) > 30 && !wheelEvent.shiftKey) {
+      console.log('Prevent Scrolling');
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
+        // create and dispatch the event
+        const hintWheel = new CustomEvent('hint-wheel-event', {});
+        window.dispatchEvent(hintWheel);
+      }
       return;
     }
 
