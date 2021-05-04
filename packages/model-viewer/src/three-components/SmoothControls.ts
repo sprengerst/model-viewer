@@ -553,7 +553,7 @@ export class SmoothControls extends EventDispatcher {
 
       this.lastTouches = touches;
     } else {
-      console.warn('Pass Event B');
+      // console.warn('Pass Event B');
 
       this.handleSinglePointerMove(event as MouseEvent);
     }
@@ -628,12 +628,15 @@ export class SmoothControls extends EventDispatcher {
     }
 
     const wheelEvent = (event as WheelEvent);
-    console.log(
-        'Math.abs((event as WheelEvent).deltaY)', Math.abs(wheelEvent.deltaY));
-    console.log('Prevent Scrolling (e.ctrlkey)', wheelEvent.ctrlKey);
+    // console.log(
+    //     'Math.abs((event as WheelEvent).deltaY)',
+    //     Math.abs(wheelEvent.deltaY));
 
-    if (Math.abs(wheelEvent.deltaY) > 30 && !wheelEvent.shiftKey) {
-      console.log('Prevent Scrolling');
+    const keyPressed = this.iOS() ? wheelEvent.altKey : wheelEvent.shiftKey;
+    // console.log('State (keyPressed)', keyPressed);
+
+    if (Math.abs(wheelEvent.deltaY) > 30 && !keyPressed) {
+      // console.log('Prevent Scroll triggered');
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) {
         // create and dispatch the event
@@ -651,6 +654,23 @@ export class SmoothControls extends EventDispatcher {
       event.preventDefault();
     }
   };
+
+  iOS() {
+    return [
+      'iPad Simulator',
+      'iPhone Simulator',
+      'iPod Simulator',
+      'iPad',
+      'iPhone',
+      'iPod',
+      'Mac68K',
+      'MacPPC',
+      'MacIntel',
+      'Macintosh'
+    ].includes(navigator.platform)
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+  }
 
   private onKeyDown = (event: KeyboardEvent) => {
     // We track if the key is actually one we respond to, so as not to
