@@ -339,6 +339,14 @@ configuration or device capabilities');
           // navigating:
           self.history.back();
           console.warn('Error while trying to present in AR with Scene Viewer');
+          const isMobile =
+              /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (isMobile) {
+            // create and dispatch the scene viewer failed event
+            const sceneViewerFailed =
+                new CustomEvent('scene-viewer-failed-event', {});
+            window.dispatchEvent(sceneViewerFailed);
+          }
           console.warn('Falling back to next ar-mode');
           this[$selectARMode]();
           // Would be nice to activateAR() here, but webXR fails due to not
