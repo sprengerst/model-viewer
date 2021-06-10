@@ -36,8 +36,8 @@
     "prepare": "",
     "build": "npm run build:tsc && npm run build:rollup",
     "build:dev": "npm run build:tsc && npm run build:rollup:dev",
-    "build:tsc": "tsc --incremental",
-    "build:rollup": "rollup -c --environment NODE_ENV:production",
+    "run:first:build:tsc": "tsc --incremental",
+    "run:second:build:rollup": "rollup -c --environment NODE_ENV:production",
     "build:rollup:dev": "rollup -c --environment NODE_ENV:development",
     "prepublishOnly": "npm run build",
     "test": "karma start --single-run",
@@ -68,7 +68,6 @@
     "3d"
   ],
   "devDependencies": {
-    "@google/model-viewer-shared-assets": "^0.0.1",
     "@jsantell/event-target": "^1.1.2",
     "@open-wc/karma-esm": "^3.0.4",
     "@rollup/plugin-commonjs": "^15.0.0",
