@@ -695,15 +695,24 @@ export class SmoothControls extends EventDispatcher {
 
     const wheelEvent = (event as WheelEvent);
     // console.log(
-    //     'Math.abs((event as WheelEvent).deltaY)',
+    //     'TODO remove Math.abs((event as WheelEvent).deltaY)',
     //     Math.abs(wheelEvent.deltaY));
 
     const keyPressed = this.iOS() ? wheelEvent.altKey : wheelEvent.shiftKey;
     // console.log('State (keyPressed)', keyPressed);
 
-    if (Math.abs(wheelEvent.deltaY) > 30 && !keyPressed) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+    let deltaTreshhold = 30;
+
+    if (!isMobile && isFirefox) {
+      // console.warn('Firefox and no mobile detected');
+      deltaTreshhold = 5;
+    }
+
+    if (Math.abs(wheelEvent.deltaY) > deltaTreshhold && !keyPressed) {
       // console.log('Prevent Scroll triggered');
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) {
         // create and dispatch the event
         const hintWheel = new CustomEvent('hint-wheel-event', {});
