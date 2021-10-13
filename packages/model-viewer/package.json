@@ -40,8 +40,6 @@
     "prepare": "",
     "build": "npm run build:tsc && npm run build:rollup",
     "build:dev": "npm run build:tsc && npm run build:rollup:dev",
-    "run:first:build:tsc": "tsc --incremental",
-    "run:second:build:rollup": "rollup -c --environment NODE_ENV:production",
     "build:rollup:dev": "rollup -c --environment NODE_ENV:development",
     "prepublishOnly": "npm run build",
     "test": "karma start --single-run",
