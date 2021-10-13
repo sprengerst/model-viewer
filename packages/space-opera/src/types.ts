@@ -36,6 +36,7 @@ export interface ModelViewerConfig {
   exposure?: number;  // Environment for hdr environment, used as ibl intensity
   poster?: string;    // Display an image before model finished loading
   reveal?: string;    // Controls when the model should be revealed
+  interactionPrompt?: string;
   shadowIntensity?: number;
   shadowSoftness?: number;
   maxCameraOrbit?: string;
@@ -64,10 +65,9 @@ interface UIState {
 }
 
 export interface RelativeFilePathsState {
-  iosName?: string|undefined;
-  modelName?: string|undefined;
-  environmentName?: string|undefined;
-  posterName: string|undefined;
+  modelName?: string;
+  environmentName?: string;
+  posterName: string;
 }
 
 export interface EnvironmentState {
@@ -77,7 +77,6 @@ export interface EnvironmentState {
 export interface ArConfigState {
   ar?: boolean;
   arModes?: string;
-  iosSrc?: string;
 }
 
 export interface BestPracticesState {
@@ -100,7 +99,7 @@ export interface EntitiesState {
   isDirtyCamera: boolean;
   mobile: MobileState;
   environment: EnvironmentState;
-  model: ModelState|null;
+  model: ModelState;
   modelViewerSnippet: ModelViewerSnippetState;
 }
 
@@ -121,14 +120,19 @@ export const INITIAL_STATE: State = {
       forcePost: false,
     },
     environment: {environmentImages: INITIAL_ENVIRONMENT_IMAGES},
-    model: null,
+    model: {fileMap: new Map<string, File>()},
     modelViewerSnippet: {
-      arConfig: {},
+      arConfig: {ar: true, arModes: 'webxr scene-viewer quick-look'},
       bestPractices: {progressBar: true, arButton: true, arPrompt: true},
-      config: {},
+      config: {
+        cameraControls: true,
+        shadowIntensity: 1,
+        environmentImage: 'neutral'
+      },
       poster: {height: 512, mimeType: 'image/webp'},
       hotspots: [],
-      relativeFilePaths: {posterName: 'poster.webp'},
+      relativeFilePaths:
+          {posterName: 'poster.webp', environmentName: 'neutral'},
       extraAttributes: {},
     },
   },

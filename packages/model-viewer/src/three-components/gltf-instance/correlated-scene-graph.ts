@@ -1,5 +1,5 @@
 import {Group, Material, Mesh, Object3D, Texture} from 'three';
-import {GLTF as ThreeGLTF, GLTFReference} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {GLTF as ThreeGLTF, GLTFReference, GLTFReferenceType} from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import {GLTF, GLTFElement} from '../../three-components/gltf-instance/gltf-2.0.js';
 
@@ -60,19 +60,20 @@ export class CorrelatedSceneGraph {
       CorrelatedSceneGraph {
     const gltf = threeGLTF.parser.json as GLTF;
 
-    const {associations} = threeGLTF.parser;
+    const associations =
+        threeGLTF.parser.associations as Map<ThreeSceneObject, GLTFReference>;
     const gltfElementMap: GLTFElementToThreeObjectMap = new Map();
 
     const defaultMaterial = {name: 'Default'} as Material;
-    const defaultReference = {type: 'materials', index: -1} as GLTFReference;
+    const defaultReference = {type: 'materials', index: -1};
 
-    // NOTE: IE11 does not have Map iterator methods
-    associations.forEach((gltfElementReference, threeObject) => {
-      // Note: GLTFLoader creates a "default" material that has no corresponding
-      // glTF element in the case that no materials are specified in the source
-      // glTF. In this case we append a default material to allow this to be
-      // operated upon.
-      if (gltfElementReference == null) {
+    for (const threeMaterial of associations.keys()) {
+      // Note: GLTFLoader creates a "default" material that has no
+      // corresponding glTF element in the case that no materials are
+      // specified in the source glTF. In this case we append a default
+      // material to allow this to be operated upon.
+      if (threeMaterial instanceof Material &&
+          associations.get(threeMaterial) == null) {
         if (defaultReference.index < 0) {
           if (gltf.materials == null) {
             gltf.materials = [];
@@ -80,27 +81,41 @@ export class CorrelatedSceneGraph {
           defaultReference.index = gltf.materials.length;
           gltf.materials.push(defaultMaterial);
         }
-        gltfElementReference = defaultReference;
+
+        threeMaterial.name = defaultMaterial.name;
+        associations.set(threeMaterial, {materials: defaultReference.index});
+      }
+    }
+
+    // Creates a reverse look up map (gltf-object to Three-object)
+    for (const [threeObject, gltfMappings] of associations) {
+      if (gltfMappings) {
+        const objWithUserData = threeObject as {userData: {associations: {}}};
+        objWithUserData.userData = objWithUserData.userData || {};
+        objWithUserData.userData.associations = gltfMappings;
       }
 
-      const {type, index} = gltfElementReference;
-      const elementArray = gltf[type] || [];
-      const gltfElement = elementArray[index];
+      for (const mapping in gltfMappings) {
+        if (mapping != null && mapping !== 'primitives') {
+          const type = mapping as GLTFReferenceType;
+          const elementArray = gltf[type] || [];
+          const gltfElement = elementArray[gltfMappings[type]!];
+          if (gltfElement == null) {
+            // TODO: Maybe throw here...
+            continue;
+          }
 
-      if (gltfElement == null) {
-        // TODO: Maybe throw here...
-        return;
+          let threeObjects = gltfElementMap.get(gltfElement);
+
+          if (threeObjects == null) {
+            threeObjects = new Set();
+            gltfElementMap.set(gltfElement, threeObjects);
+          }
+
+          threeObjects.add(threeObject);
+        }
       }
-
-      let threeObjects = gltfElementMap.get(gltfElement);
-
-      if (threeObjects == null) {
-        threeObjects = new Set();
-        gltfElementMap.set(gltfElement, threeObjects);
-      }
-
-      threeObjects.add(threeObject);
-    });
+    }
 
     return new CorrelatedSceneGraph(
         threeGLTF, gltf, associations, gltfElementMap);
@@ -109,7 +124,7 @@ export class CorrelatedSceneGraph {
   /**
    * Transfers the association between a raw glTF and a Three.js scene graph
    * to a clone of the Three.js scene graph, resolved as a new
-   * CorrelatedsceneGraph instance.
+   * CorrelatedSceneGraph instance.
    */
   private static[$correlateCloneThreeGLTF](
       cloneThreeGLTF: ThreeGLTF,
@@ -119,68 +134,49 @@ export class CorrelatedSceneGraph {
     const originalGLTF = upstreamCorrelatedSceneGraph.gltf;
     const cloneGLTF: GLTF = JSON.parse(JSON.stringify(originalGLTF));
     const cloneThreeObjectMap: ThreeObjectToGLTFElementHandleMap = new Map();
-    const cloneGLTFELementMap: GLTFElementToThreeObjectMap = new Map();
-
-    const defaultMaterial = {name: 'Default'} as Material;
-    const defaultReference = {type: 'materials', index: -1} as GLTFReference;
+    const cloneGLTFElementMap: GLTFElementToThreeObjectMap = new Map();
 
     for (let i = 0; i < originalThreeGLTF.scenes.length; i++) {
       this[$parallelTraverseThreeScene](
           originalThreeGLTF.scenes[i],
           cloneThreeGLTF.scenes[i],
           (object: ThreeSceneObject, cloneObject: ThreeSceneObject) => {
-            let elementReference =
+            const elementReference =
                 upstreamCorrelatedSceneGraph.threeObjectMap.get(object);
-
-            if (((object as Mesh).isMesh || (object as Material).isMaterial) &&
-                elementReference == null) {
-              // Checks if default material was allready addded to the gltf.
-              if (cloneGLTF.materials && cloneGLTF.materials.length) {
-                const material =
-                    cloneGLTF.materials[cloneGLTF.materials.length - 1];
-                if (material.name === 'Default') {
-                  defaultReference.index = cloneGLTF.materials.length - 1;
-                }
-              }
-
-              // Adds the defaul material if the default material was not added.
-              if (defaultReference.index < 0) {
-                if (cloneGLTF.materials == null) {
-                  cloneGLTF.materials = [];
-                }
-                defaultReference.index = cloneGLTF.materials.length;
-                cloneGLTF.materials.push(defaultMaterial);
-              }
-
-              elementReference = defaultReference;
-            }
-
 
             if (elementReference == null) {
               return;
             }
 
-            const {type, index} = elementReference;
-            const cloneElement = cloneGLTF[type]![index];
+            for (const mapping in elementReference) {
+              if (mapping != null && mapping !== 'primitives') {
+                const type = mapping as GLTFReferenceType;
+                const index = elementReference[type]!;
+                const cloneElement = cloneGLTF[type]![index];
 
-            cloneThreeObjectMap.set(cloneObject, {type, index});
+                const mappings =
+                    cloneThreeObjectMap.get(cloneObject) || {} as GLTFReference;
+                mappings[type] = index;
+                cloneThreeObjectMap.set(cloneObject, mappings);
 
-            const cloneObjects: Set<typeof cloneObject> =
-                cloneGLTFELementMap.get(cloneElement) || new Set();
-            cloneObjects.add(cloneObject);
+                const cloneObjects: Set<typeof cloneObject> =
+                    cloneGLTFElementMap.get(cloneElement) || new Set();
+                cloneObjects.add(cloneObject);
 
-            cloneGLTFELementMap.set(cloneElement, cloneObjects);
+                cloneGLTFElementMap.set(cloneElement, cloneObjects);
+              }
+            }
           });
     }
 
     return new CorrelatedSceneGraph(
-        cloneThreeGLTF, cloneGLTF, cloneThreeObjectMap, cloneGLTFELementMap);
+        cloneThreeGLTF, cloneGLTF, cloneThreeObjectMap, cloneGLTFElementMap);
   }
 
   /**
-   * Traverses two presumably identical Three.js scenes, and invokes a callback
-   * for each Object3D or Material encountered, including the initial scene.
-   * Adapted from
+   * Traverses two presumably identical Three.js scenes, and invokes a
+   * callback for each Object3D or Material encountered, including the initial
+   * scene. Adapted from
    * https://github.com/mrdoob/three.js/blob/7c1424c5819ab622a346dd630ee4e6431388021e/examples/jsm/utils/SkeletonUtils.js#L586-L596
    */
   private static[$parallelTraverseThreeScene](
@@ -257,34 +253,5 @@ export class CorrelatedSceneGraph {
     this[$gltf] = gltf;
     this[$gltfElementMap] = gltfElementMap;
     this[$threeObjectMap] = threeObjectMap;
-  }
-
-  async loadVariant(variantName: string): Promise<Set<number>> {
-    const updatedMaterials = new Set<number>();
-
-    if (!('variants' in this.threeGLTF.userData) ||
-        !('functions' in this.threeGLTF.userData) ||
-        !('selectVariant' in this.threeGLTF.userData.functions)) {
-      return updatedMaterials;
-    }
-
-    await this.threeGLTF.userData.functions.selectVariant(
-        this.threeGLTF.scene,
-        variantName,
-        true,
-        (object: Object3D,
-         _oldMaterial: Material,
-         gltfMaterialIndex: number) => {
-          updatedMaterials.add(gltfMaterialIndex);
-          const gltfElement = this.gltf.materials![gltfMaterialIndex];
-          let threeObjects = this.gltfElementMap.get(gltfElement);
-          if (threeObjects == null) {
-            threeObjects = new Set();
-            this.gltfElementMap.set(gltfElement, threeObjects);
-          }
-          threeObjects.add((object as Mesh).material as Material);
-        });
-
-    return updatedMaterials;
   }
 }

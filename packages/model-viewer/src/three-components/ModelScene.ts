@@ -17,6 +17,7 @@ import {AnimationAction, AnimationClip, AnimationMixer, Box3, Camera, Event as T
 import {CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import ModelViewerElementBase, {$renderer, RendererInterface} from '../model-viewer-base.js';
+import {ModelViewerElement} from '../model-viewer.js';
 import {resolveDpr} from '../utilities.js';
 
 import {Damper, SETTLING_TIME} from './Damper.js';
@@ -63,11 +64,12 @@ const vector3 = new Vector3();
  * Provides lights and cameras to be used in a renderer.
  */
 export class ModelScene extends Scene {
-  public element: ModelViewerElementBase;
+  public element: ModelViewerElement;
   public canvas: HTMLCanvasElement;
   public context: CanvasRenderingContext2D|ImageBitmapRenderingContext|null =
       null;
   public annotationRenderer = new CSS2DRenderer();
+  public schemaElement = document.createElement('script');
   public width = 1;
   public height = 1;
   public aspect = 1;
@@ -114,7 +116,7 @@ export class ModelScene extends Scene {
 
     this.name = 'ModelScene';
 
-    this.element = element;
+    this.element = element as ModelViewerElement;
     this.canvas = canvas;
 
     // These default camera values are never used, as they are reset once the
@@ -139,6 +141,8 @@ export class ModelScene extends Scene {
     style.position = 'absolute';
     style.top = '0';
     this.element.shadowRoot!.querySelector('.default')!.appendChild(domElement);
+
+    this.schemaElement.setAttribute('type', 'application/ld+json');
   }
 
   /**
@@ -255,6 +259,7 @@ export class ModelScene extends Scene {
     this.updateFraming(target);
 
     this.frameModel();
+    this.updateShadow();
     this.setShadowIntensity(this.shadowIntensity);
     this.dispatchEvent({type: 'model-load', url: this.url});
   }
@@ -506,27 +511,25 @@ export class ModelScene extends Scene {
     try {
       const {currentAnimationAction: lastAnimationAction} = this;
 
-      this.currentAnimationAction =
-          this.mixer.clipAction(animationClip, this).play();
-      this.currentAnimationAction.enabled = true;
+      const action = this.mixer.clipAction(animationClip, this);
+      this.currentAnimationAction = action;
 
-      if (lastAnimationAction != null &&
-          this.currentAnimationAction !== lastAnimationAction) {
-        this.currentAnimationAction.crossFadeFrom(
-            lastAnimationAction, crossfadeTime, false);
+      if ((this.element as any).paused) {
+        this.mixer.stopAllAction();
+      } else if (
+          lastAnimationAction != null && action !== lastAnimationAction) {
+        action.crossFadeFrom(lastAnimationAction, crossfadeTime, false);
       }
+
+      action.enabled = true;
+      action.play();
     } catch (error) {
       console.error(error);
     }
   }
 
   stopAnimation() {
-    if (this.currentAnimationAction != null) {
-      this.currentAnimationAction.stop();
-      this.currentAnimationAction.reset();
-      this.currentAnimationAction = null;
-    }
-
+    this.currentAnimationAction = null;
     this.mixer.stopAllAction();
   }
 
@@ -544,6 +547,7 @@ export class ModelScene extends Scene {
       const side =
           (this.element as any).arPlacement === 'wall' ? 'back' : 'bottom';
       shadow.setScene(this, this.shadowSoftness, side);
+      shadow.setRotation(this.yaw);
     }
   }
 
@@ -555,17 +559,17 @@ export class ModelScene extends Scene {
     if (this._currentGLTF == null) {
       return;
     }
-    let shadow = this.shadow;
-    const side =
-        (this.element as any).arPlacement === 'wall' ? 'back' : 'bottom';
-    if (shadow != null) {
-      shadow.setIntensity(shadowIntensity);
-      shadow.setScene(this, this.shadowSoftness, side);
-    } else if (shadowIntensity > 0) {
-      shadow = new Shadow(this, this.shadowSoftness, side);
-      shadow.setIntensity(shadowIntensity);
-      this.shadow = shadow;
+    if (shadowIntensity <= 0 && this.shadow == null) {
+      return;
     }
+
+    if (this.shadow == null) {
+      const side =
+          (this.element as any).arPlacement === 'wall' ? 'back' : 'bottom';
+      this.shadow = new Shadow(this, this.shadowSoftness, side);
+      this.shadow.setRotation(this.yaw);
+    }
+    this.shadow.setIntensity(shadowIntensity);
   }
 
   /**
@@ -618,15 +622,19 @@ export class ModelScene extends Scene {
     }
   }
 
+  get raycaster() {
+    return raycaster;
+  }
+
   /**
    * This method returns the world position and model-space normal of the point
    * on the mesh corresponding to the input pixel coordinates given relative to
    * the model-viewer element. If the mesh is not hit, the result is null.
    */
-  positionAndNormalFromPoint(pixelPosition: Vector2, object: Object3D = this):
+  positionAndNormalFromPoint(ndcPosition: Vector2, object: Object3D = this):
       {position: Vector3, normal: Vector3}|null {
-    raycaster.setFromCamera(pixelPosition, this.getCamera());
-    const hits = raycaster.intersectObject(object, true);
+    this.raycaster.setFromCamera(ndcPosition, this.getCamera());
+    const hits = this.raycaster.intersectObject(object, true);
 
     if (hits.length === 0) {
       return null;
@@ -710,5 +718,40 @@ export class ModelScene extends Scene {
     this.forHotspots((hotspot) => {
       hotspot.visible = visible;
     });
+  }
+
+  updateSchema(src: string|null) {
+    const {schemaElement, element} = this;
+    const {alt, poster, iosSrc} = element;
+    if (src != null) {
+      const encoding = [{
+        '@type': 'MediaObject',
+        contentUrl: src,
+        encodingFormat: src.split('.').pop()?.toLowerCase() === 'gltf' ?
+            'model/gltf+json' :
+            'model/gltf-binary'
+      }];
+
+      if (iosSrc) {
+        encoding.push({
+          '@type': 'MediaObject',
+          contentUrl: iosSrc,
+          encodingFormat: 'model/vnd.usdz+zip'
+        });
+      }
+
+      const structuredData = {
+        '@context': 'http://schema.org/',
+        '@type': '3DModel',
+        image: poster ?? undefined,
+        name: alt ?? undefined,
+        encoding
+      };
+
+      schemaElement.textContent = JSON.stringify(structuredData);
+      document.head.appendChild(schemaElement);
+    } else if (schemaElement.parentElement != null) {
+      schemaElement.parentElement.removeChild(schemaElement);
+    }
   }
 }
