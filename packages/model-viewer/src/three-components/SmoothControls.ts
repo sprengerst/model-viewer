@@ -524,19 +524,41 @@ export class SmoothControls extends EventDispatcher {
   };
   private touchModeRotate: TouchMode = (event) => {
     const {touches} = event;
-    const {touchAction} = this._options;
-    if (!this.touchDecided && touchAction !== 'none') {
-      this.touchDecided = true;
-      const {clientX, clientY} = touches[0];
-      const dx = Math.abs(clientX - this.lastPointerPosition.clientX);
-      const dy = Math.abs(clientY - this.lastPointerPosition.clientY);
-      // If motion is mostly vertical, assume scrolling is the intent.
-      if ((touchAction === 'pan-y' && dy > dx) ||
-          (touchAction === 'pan-x' && dx > dy)) {
-        this.touchMode = null;
-        return;
-      }
-    }
+          const {touchAction} = this._options;
+          if (!this.touchDecided && touchAction !== 'none') {
+            this.touchDecided = true;
+            const {clientX, clientY} = touches[0];
+            const dx = Math.abs(clientX - this.lastPointerPosition.clientX);
+            const dy = Math.abs(clientY - this.lastPointerPosition.clientY);
+            // If motion is mostly vertical, assume scrolling is the intent.
+
+            const isMobile =
+                /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+              // console.warn('dx (dx))', dx);
+              // console.warn('dy (dy))', dy);
+
+              if (dy > dx && dy > 10) {
+                // console.warn('dy > dx && dy > 8');
+                this.touchMode = null;
+                return;
+              } else {
+                this.touchMode = this.touchModeRotate;
+              }
+            }
+
+            if ((touchAction === 'pan-y' && dy > dx) ||
+                (touchAction === 'pan-x' && dx > dy)) {
+              this.touchMode = null;
+              return;
+            }
+          }
+
+          // console.warn('Pass Event A (this.touchDecided)',
+          // this.touchDecided); console.warn('Pass Event A (touchAction)',
+          // touchAction);
+
     this.handleSinglePointerMove(touches[0]);
 
     this.lastTouches = touches;
@@ -668,6 +690,22 @@ export class SmoothControls extends EventDispatcher {
 
   private onWheel = (event: Event) => {
     if (!this.canInteract) {
+      return;
+    }
+
+    const wheelEvent = (event as WheelEvent);
+    console.log(
+        'Math.abs((event as WheelEvent).deltaY)', Math.abs(wheelEvent.deltaY));
+    console.log('Prevent Scrolling (e.ctrlkey)', wheelEvent.ctrlKey);
+
+    if (Math.abs(wheelEvent.deltaY) > 30 && !wheelEvent.shiftKey) {
+      console.log('Prevent Scrolling');
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
+        // create and dispatch the event
+        const hintWheel = new CustomEvent('hint-wheel-event', {});
+        window.dispatchEvent(hintWheel);
+      }
       return;
     }
 

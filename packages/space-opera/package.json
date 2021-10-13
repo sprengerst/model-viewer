@@ -11,7 +11,7 @@
     "clean": "rm tsconfig.tsbuildinfo; rm -rf lib && rm -rf dist",
     "test": "karma start --single-run",
     "test:ci": "npm run test",
-    "prepare": "if [ ! -L './shared-assets' ]; then ln -s ./node_modules/@google/model-viewer-shared-assets ./shared-assets; fi",
+    "prepare": "",
     "watch:test": "karma start",
     "watch:tsc": "tsc -w",
     "watch:rollup": "rollup -c -w",
