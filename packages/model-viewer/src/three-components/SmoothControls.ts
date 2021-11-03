@@ -529,6 +529,23 @@ export class SmoothControls extends EventDispatcher {
             const dx = Math.abs(clientX - this.lastPointerPosition.clientX);
             const dy = Math.abs(clientY - this.lastPointerPosition.clientY);
             // If motion is mostly vertical, assume scrolling is the intent.
+
+            const isMobile =
+                /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+              // console.warn('dx (dx))', dx);
+              // console.warn('dy (dy))', dy);
+
+              if (dy > dx && dy > 10) {
+                // console.warn('dy > dx && dy > 8');
+                this.touchMode = 'scroll';
+                return;
+              } else {
+                this.touchMode = 'rotate';
+              }
+            }
+
             if ((touchAction === 'pan-y' && dy > dx) ||
                 (touchAction === 'pan-x' && dx > dy)) {
               this.touchMode = 'scroll';
@@ -617,6 +634,34 @@ export class SmoothControls extends EventDispatcher {
       return;
     }
 
+    const wheelEvent = (event as WheelEvent);
+    // console.log(
+    //     'TODO remove Math.abs((event as WheelEvent).deltaY)',
+    //     Math.abs(wheelEvent.deltaY));
+
+    const keyPressed = this.iOS() ? wheelEvent.altKey : wheelEvent.shiftKey;
+    // console.log('State (keyPressed)', keyPressed);
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+    let deltaTreshhold = 30;
+
+    if (!isMobile && isFirefox) {
+      // console.warn('Firefox and no mobile detected');
+      deltaTreshhold = 5;
+    }
+
+    if (Math.abs(wheelEvent.deltaY) > deltaTreshhold && !keyPressed) {
+      // console.log('Prevent Scroll triggered');
+      if (!isMobile) {
+        // create and dispatch the event
+        const hintWheel = new CustomEvent('hint-wheel-event', {});
+        window.dispatchEvent(hintWheel);
+      }
+      return;
+    }
+
     const deltaZoom = (event as WheelEvent).deltaY *
         ((event as WheelEvent).deltaMode == 1 ? 18 : 1) * ZOOM_SENSITIVITY / 30;
     this.userAdjustOrbit(0, 0, deltaZoom);
@@ -625,6 +670,23 @@ export class SmoothControls extends EventDispatcher {
       event.preventDefault();
     }
   };
+
+  iOS() {
+    return [
+      'iPad Simulator',
+      'iPhone Simulator',
+      'iPod Simulator',
+      'iPad',
+      'iPhone',
+      'iPod',
+      'Mac68K',
+      'MacPPC',
+      'MacIntel',
+      'Macintosh'
+    ].includes(navigator.platform)
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+  }
 
   private onKeyDown = (event: KeyboardEvent) => {
     // We track if the key is actually one we respond to, so as not to

@@ -86,6 +86,9 @@ export const ARMixin = <T extends Constructor<ModelViewerElementBase>>(
     @property({type: String, attribute: 'ar-placement'})
     arPlacement: string = 'floor';
 
+    @property({type: String, attribute: 'fallback-url'})
+    fallBackUrl: string = '';
+
     @property({type: String, attribute: 'ar-modes'})
     arModes: string = DEFAULT_AR_MODES;
 
@@ -330,12 +333,19 @@ configuration or device capabilities');
         params.set('link', linkUrl.toString());
       }
 
+      let fallBackUrlFinished;
+      if (this.fallBackUrl && this.fallBackUrl.length > 0) {
+        fallBackUrlFinished = encodeURIComponent(this.fallBackUrl);
+      } else {
+        fallBackUrlFinished = encodeURIComponent(locationUrl.toString());
+      }
+
       const intent = `intent://arvr.google.com/scene-viewer/1.0?${
           params.toString() + '&file=' +
           encodeURIComponent(
               modelUrl
                   .toString())}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url=${
-          encodeURIComponent(locationUrl.toString())};end;`;
+          fallBackUrlFinished};end;`;
 
       const undoHashChange = () => {
         if (self.location.hash === noArViewerSigil) {
@@ -347,6 +357,14 @@ configuration or device capabilities');
           // navigating:
           self.history.back();
           console.warn('Error while trying to present in AR with Scene Viewer');
+          const isMobile =
+              /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (isMobile) {
+            // create and dispatch the scene viewer failed event
+            const sceneViewerFailed =
+                new CustomEvent('scene-viewer-failed-event', {});
+            window.dispatchEvent(sceneViewerFailed);
+          }
           console.warn('Falling back to next ar-mode');
           this[$selectARMode]();
           // Would be nice to activateAR() here, but webXR fails due to not
@@ -357,6 +375,7 @@ configuration or device capabilities');
       self.addEventListener('hashchange', undoHashChange, {once: true});
 
       this[$arAnchor].setAttribute('href', intent);
+      this[$arAnchor].setAttribute('target', '_top');
       console.log('Attempting to present in AR with Scene Viewer...');
       this[$arAnchor].click();
     }

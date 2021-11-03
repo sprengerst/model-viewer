@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="bb5b5664-411c-4b05-9e10-582e53dae92b" name="Default Changelist" comment="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/space-opera/package-lock.json">
+      <change beforePath="$PROJECT_DIR$/packages/model-viewer/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/model-viewer/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/model-viewer/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/model-viewer/src/features/ar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/model-viewer/src/features/ar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/model-viewer/src/three-components/SmoothControls.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/model-viewer/src/three-components/SmoothControls.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Stefan Sprenger &lt;stefansprenger@gmx.at&gt;" />
+        <option value="stefansprenger@gmx.at" />
+        <option value="Stefan Sprenger &lt;sprengerst@stud.sbg.ac.at&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="f94c8c277f6ca03af11e6c818cac78bed2b81c0d" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="1s4bwzFj457hTyDQzyTmNKeOSk2" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2020.2.4\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="vcs.patch.path" value="$PROJECT_DIR$/../../Temp" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="npm.build:rollup">
+    <configuration name="build:rollup" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/model-viewer/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build:rollup" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="build:rollup:dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/model-viewer/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build:rollup:dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="build:tsc" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/model-viewer/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build:tsc" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="run:first:build:tsc" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/model-viewer/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="run:first:build:tsc" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="run:second:build:rollup" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/model-viewer/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="run:second:build:rollup" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.run:second:build:rollup" />
+        <item itemvalue="npm.run:first:build:tsc" />
+        <item itemvalue="npm.build:tsc" />
+        <item itemvalue="npm.build:rollup:dev" />
+        <item itemvalue="npm.build:rollup" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bb5b5664-411c-4b05-9e10-582e53dae92b" name="Default Changelist" comment="" />
+      <created>1620135052655</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1620135052655</updated>
+      <workItem from="1620135054960" duration="6274000" />
+      <workItem from="1620142536742" duration="5620000" />
+      <workItem from="1620155480340" duration="42000" />
+      <workItem from="1620390120279" duration="1511000" />
+      <workItem from="1621947499902" duration="6261000" />
+      <workItem from="1622032815019" duration="7000" />
+      <workItem from="1622035994706" duration="4838000" />
+      <workItem from="1622118546291" duration="3000" />
+      <workItem from="1622552426960" duration="1288000" />
+      <workItem from="1622647006333" duration="445000" />
+      <workItem from="1623333846790" duration="1497000" />
+      <workItem from="1625577032088" duration="832000" />
+      <workItem from="1625661026113" duration="4000" />
+      <workItem from="1628092121014" duration="4968000" />
+      <workItem from="1628149066782" duration="6232000" />
+      <workItem from="1628187991959" duration="330000" />
+      <workItem from="1628194382572" duration="637000" />
+      <workItem from="1628197627312" duration="597000" />
+      <workItem from="1629988149821" duration="1531000" />
+      <workItem from="1630055149704" duration="5000" />
+      <workItem from="1634112716979" duration="3384000" />
+      <workItem from="1634290077786" duration="652000" />
+      <workItem from="1634294306366" duration="6000" />
+      <workItem from="1634651476543" duration="558000" />
+      <workItem from="1634822848146" duration="1149000" />
+      <workItem from="1635253149343" duration="1282000" />
+      <workItem from="1635869398164" duration="913000" />
+      <workItem from="1635935815281" duration="1387000" />
+      <workItem from="1635959886833" duration="843000" />
+      <workItem from="1635960750785" duration="24000" />
+      <workItem from="1635960777187" duration="177000" />
+      <workItem from="1635960975448" duration="428000" />
+      <workItem from="1635961427467" duration="1301000" />
+    </task>
+    <task id="LOCAL-00001" summary="custom scroll handling for wheel events">
+      <created>1620141697248</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1620141697248</updated>
+    </task>
+    <task id="LOCAL-00002" summary="removed logging">
+      <created>1620155506579</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1620155506579</updated>
+    </task>
+    <task id="LOCAL-00003" summary="introduce scene-viewer-failed event">
+      <created>1622553683254</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1622553683254</updated>
+    </task>
+    <task id="LOCAL-00004" summary="put in package lock">
+      <created>1623333984464</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1623333984464</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;packages/editing-adapter/package-lock.json&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package-lock.json&#10;#&#9;packages/space-opera/package-lock.json">
+      <created>1623334231687</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1623334231687</updated>
+    </task>
+    <task id="LOCAL-00006" summary="fine tuned scrolling for firefox">
+      <created>1623335194637</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1623335194637</updated>
+    </task>
+    <task id="LOCAL-00007" summary="intent link export">
+      <created>1628156972734</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1628156972734</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fallback url and target top">
+      <created>1628194411433</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1628194411433</updated>
+    </task>
+    <task id="LOCAL-00009" summary="custom scroll handling for wheel events&#10;&#10;# Conflicts:&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/shared-assets/package.json&#10;#&#9;packages/space-opera/package.json">
+      <created>1634112941962</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1634112941962</updated>
+    </task>
+    <task id="LOCAL-00010" summary="lockfile">
+      <created>1634112968829</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1634112968829</updated>
+    </task>
+    <task id="LOCAL-00011" summary="removed logging&#10;&#10;# Conflicts:&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts">
+      <created>1634113196555</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1634113196555</updated>
+    </task>
+    <task id="LOCAL-00012" summary="introduce scene-viewer-failed event&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json">
+      <created>1634113288425</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1634113288425</updated>
+    </task>
+    <task id="LOCAL-00013" summary="put in package lock&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/package.json&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package-lock.json&#10;#&#9;packages/space-opera/package-lock.json">
+      <created>1634113436316</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1634113436316</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/package.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/modelviewer.dev/package.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/shared-assets/package.json&#10;#&#9;packages/space-opera/package-lock.json&#10;#&#9;packages/space-opera/package.json">
+      <created>1634114047318</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1634114047318</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/space-opera/package-lock.json">
+      <created>1634114308974</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1634114308974</updated>
+    </task>
+    <task id="LOCAL-00016" summary="fixed package lock json">
+      <created>1634115519913</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1634115519913</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/space-opera/package-lock.json">
+      <created>1634651617919</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1634651617919</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="7908fe5b-85a8-4502-8cca-bf1e37d598c9">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="cdc38473-e405-4950-b23d-ea2778963ee6">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="7908fe5b-85a8-4502-8cca-bf1e37d598c9" value="TOOL_WINDOW" />
+        <entry key="cdc38473-e405-4950-b23d-ea2778963ee6" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="custom scroll handling for wheel events" />
+    <MESSAGE value="removed logging" />
+    <MESSAGE value="run first and second fix for modelviewer" />
+    <MESSAGE value="introduce scene viewer failed event" />
+    <MESSAGE value="introduce scene-viewer-failed event" />
+    <MESSAGE value="put in package lock" />
+    <MESSAGE value="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;packages/editing-adapter/package-lock.json&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package-lock.json&#10;#&#9;packages/space-opera/package-lock.json" />
+    <MESSAGE value="fine tuned scrolling for firefox" />
+    <MESSAGE value="intent link export" />
+    <MESSAGE value="fallback url and target top" />
+    <MESSAGE value="custom scroll handling for wheel events&#10;&#10;# Conflicts:&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/shared-assets/package.json&#10;#&#9;packages/space-opera/package.json" />
+    <MESSAGE value="lockfile" />
+    <MESSAGE value="removed logging&#10;&#10;# Conflicts:&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts" />
+    <MESSAGE value="introduce scene-viewer-failed event&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json" />
+    <MESSAGE value="put in package lock&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/package.json&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package-lock.json&#10;#&#9;packages/space-opera/package-lock.json" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/package.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/modelviewer.dev/package.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/shared-assets/package.json&#10;#&#9;packages/space-opera/package-lock.json&#10;#&#9;packages/space-opera/package.json" />
+    <MESSAGE value="fixed package lock json" />
+    <MESSAGE value="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/space-opera/package-lock.json" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'upstream/master'&#10;&#10;# Conflicts:&#10;#&#9;package-lock.json&#10;#&#9;packages/model-viewer/package-lock.json&#10;#&#9;packages/model-viewer/src/three-components/SmoothControls.ts&#10;#&#9;packages/modelviewer.dev/package-lock.json&#10;#&#9;packages/render-fidelity-tools/package.json&#10;#&#9;packages/space-opera/package-lock.json" />
+  </component>
+</project>
