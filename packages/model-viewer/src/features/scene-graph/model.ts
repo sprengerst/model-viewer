@@ -17,7 +17,6 @@ import {Group, Intersection, Material as ThreeMaterial, Mesh, MeshStandardMateri
 
 import {CorrelatedSceneGraph, GLTFElementToThreeObjectMap, ThreeObjectSet} from '../../three-components/gltf-instance/correlated-scene-graph.js';
 import {GLTF, GLTFElement, Material as GLTFMaterial} from '../../three-components/gltf-instance/gltf-2.0.js';
-import {$cloneAndPatchMaterial, ModelViewerGLTFInstance} from '../../three-components/gltf-instance/ModelViewerGLTFInstance.js';
 
 import {Model as ModelInterface} from './api.js';
 import {$setActive, $variantSet, Material} from './material.js';
@@ -261,12 +260,9 @@ export class Model implements ModelInterface {
    * default/initial materials if 'null' is provided.
    */
   async[$switchVariant](variantName: string|null) {
-    const promises = new Array<Promise<ThreeMaterial|ThreeMaterial[]|null>>();
     for (const primitive of this[$primitivesList]) {
-      promises.push(primitive.enableVariant(variantName));
+      await primitive.enableVariant(variantName);
     }
-
-    await Promise.all(promises);
 
     for (const material of this.materials) {
       material[$setActive](false);
@@ -306,8 +302,7 @@ export class Model implements ModelInterface {
 
     const clonedSet = new Set<MeshStandardMaterial>();
     for (const [i, threeMaterial] of threeMaterialSet.entries()) {
-      const clone = ModelViewerGLTFInstance[$cloneAndPatchMaterial](
-                        threeMaterial) as MeshStandardMaterial;
+      const clone = threeMaterial.clone() as MeshStandardMaterial;
       clone.name =
           newMaterialName + (threeMaterialSet.size > 1 ? '_inst' + i : '');
       clonedSet.add(clone);
