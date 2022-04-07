@@ -32,15 +32,15 @@ import '../shared/slider_with_input/slider_with_input.js';
 import '../shared/texture_picker/texture_picker.js';
 
 import {Material} from '@google/model-viewer/lib/features/scene-graph/material';
+import {TextureInfo} from '@google/model-viewer/lib/features/scene-graph/texture-info.js';
 import {RGB, RGBA} from '@google/model-viewer/lib/model-viewer';
+import {AlphaMode} from '@google/model-viewer/lib/three-components/gltf-instance/gltf-2.0';
+import {GLTF, TextureInfo as GLTFTextureInfo} from '@google/model-viewer/lib/three-components/gltf-instance/gltf-defaulted';
 import {TextField} from '@material/mwc-textfield';
 import {PaperListboxElement} from '@polymer/paper-listbox';
 import {customElement, html, internalProperty, query} from 'lit-element';
 import * as color from 'ts-closure-library/lib/color/color';  // from //third_party/javascript/closure/color
 
-import {TextureInfo} from '../../../../model-viewer/lib/features/scene-graph/texture-info.js';
-import {AlphaMode} from '../../../../model-viewer/lib/three-components/gltf-instance/gltf-2.0.js';
-import {GLTF, TextureInfo as GLTFTextureInfo} from '../../../../model-viewer/lib/three-components/gltf-instance/gltf-defaulted';
 import {reduxStore} from '../../space_opera_base.js';
 import {State} from '../../types.js';
 import {ConnectedLitElement} from '../connected_lit_element/connected_lit_element.js';
@@ -99,6 +99,8 @@ export class MaterialPanel extends ConnectedLitElement {
   @query('me-dropdown#alpha-mode-picker') alphaModePicker!: Dropdown;
   @query('me-slider-with-input#alpha-cutoff')
   alphaCutoffSlider!: SliderWithInputElement;
+  @query('me-slider-with-input#alpha-factor')
+  alphaFactorSlider!: SliderWithInputElement;
   @query('#alpha-cutoff-container') alphaCutoffContainer!: HTMLDivElement;
   @query('me-checkbox#doubleSidedCheckbox')
   doubleSidedCheckbox!: CheckboxElement;
@@ -316,6 +318,7 @@ export class MaterialPanel extends ConnectedLitElement {
         this.getTextureIndex(emissiveTexture);
 
     this.alphaCutoffSlider.value = material.getAlphaCutoff();
+    this.alphaFactorSlider.value = baseColorFactor[3];
     this.doubleSidedCheckbox.checked = material.getDoubleSided();
 
     const alphaMode = material.getAlphaMode();
@@ -834,6 +837,14 @@ export class MaterialPanel extends ConnectedLitElement {
     reduxStore.dispatch(dispatchModelDirty());
   }
 
+  onAlphaFactorChange() {
+    const material = this.getMaterialVariant();
+    const rgba = this.selectedBaseColor;
+    rgba[3] = this.alphaFactorSlider.value;
+    material.pbrMetallicRoughness.setBaseColorFactor(rgba);
+    reduxStore.dispatch(dispatchModelDirty());
+  }
+
   revertMetallicRoughnessTexture() {
     this.revertTexture(
         this.metallicRoughnessTexturePicker,
@@ -898,6 +909,12 @@ export class MaterialPanel extends ConnectedLitElement {
   revertAlphaCutoff() {
     this.alphaCutoffSlider.value = this.getOriginalMaterial().alphaCutoff;
     this.onAlphaCutoffChange();
+  }
+
+  revertAlphaFactor() {
+    this.alphaFactorSlider.value =
+        this.getOriginalMaterial().pbrMetallicRoughness.baseColorFactor[3];
+    this.onAlphaFactorChange();
   }
 
   revertAlphaMode() {
@@ -1056,15 +1073,25 @@ export class MaterialPanel extends ConnectedLitElement {
       <mwc-icon-button class="RevertButton" id="revert-alpha-cutoff" icon="undo"
         title="Revert to original alpha mode"
         @click=${this.revertAlphaMode}></mwc-icon-button>
-      <me-dropdown id="alpha-mode-picker"
+      <me-dropdown class="TopMargin" id="alpha-mode-picker"
         @select=${this.onAlphaModeSelect}>
         ${
         ALPHA_BLEND_MODES.map(
             mode => html`<paper-item value=${mode}>${mode}</paper-item>`)}
       </me-dropdown>
     </div>
+    <div id="alpha-factor-container"}>
+      <div class="SectionLabel TopMargin" id="alpha-factor-label">Alpha Factor:</div>
+      <div class="MRSliderContainer">
+        <mwc-icon-button class="RevertButton" id="revert-alpha-mode" icon="undo"
+          title="Revert to original alpha factor"
+          @click=${this.revertAlphaFactor}></mwc-icon-button>
+        <me-slider-with-input class="MRSlider" id="alpha-factor" min="0.0" max="1.0"
+        step="0.01" @change=${this.onAlphaFactorChange}></me-slider-with-input>
+      </div>
+    </div>
     <div id="alpha-cutoff-container"}>
-      <div class="SectionLabel" id="alpha-cutoff-label">Alpha Cutoff:</div>
+      <div class="SectionLabel TopMargin" id="alpha-cutoff-label">Alpha Cutoff:</div>
       <div class="MRSliderContainer">
         <mwc-icon-button class="RevertButton" id="revert-alpha-mode" icon="undo"
           title="Revert to original alpha cutoff"

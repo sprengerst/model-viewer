@@ -16,7 +16,7 @@
 import '../types/webxr.js';
 
 import {Event as ThreeEvent, EventDispatcher, Matrix4, PerspectiveCamera, Vector3, WebGLRenderer} from 'three';
-import {XREstimatedLight} from 'three/examples/jsm/webxr/XREstimatedLight';
+import {XREstimatedLight} from 'three/examples/jsm/webxr/XREstimatedLight.js';
 
 import {ControlsInterface} from '../features/controls.js';
 import ModelViewerElementBase, {$onResize, $sceneIsReady} from '../model-viewer-base.js';
@@ -31,7 +31,7 @@ import {Renderer} from './Renderer.js';
 const INIT_FRAMES = 30;
 // AR shadow is not user-configurable. This is to pave the way for AR lighting
 // estimation, which will be used once available in WebXR.
-const AR_SHADOW_INTENSITY = 0.3;
+const AR_SHADOW_INTENSITY = 0.8;
 const ROTATION_RATE = 1.5;
 // Angle down (towards bottom of screen) from camera center ray to use for hit
 // testing against the floor. This makes placement faster and more intuitive
@@ -341,7 +341,7 @@ export class ARRenderer extends EventDispatcher {
 
       scene.position.set(0, 0, 0);
       scene.scale.set(1, 1, 1);
-      scene.setShadowScaleAndOffset(1, 0);
+      scene.setShadowOffset(0);
       const yaw = this.turntableRotation;
       if (yaw != null) {
         scene.yaw = yaw;
@@ -671,7 +671,7 @@ export class ARRenderer extends EventDispatcher {
           // drop the placement box to the floor. The model falls on select end.
           if (offset < 0) {
             this.placementBox!.offsetHeight = offset / scale;
-            this.presentedScene!.setShadowScaleAndOffset(scale, offset);
+            this.presentedScene!.setShadowOffset(offset);
             // Interpolate hit ray up to drag plane
             const cameraPosition = vector3.copy(scene.getCamera().position);
             const alpha = -offset / (cameraPosition.y - hit.y);
@@ -688,7 +688,8 @@ export class ARRenderer extends EventDispatcher {
 
   private moveScene(delta: number) {
     const scene = this.presentedScene!;
-    const {position, yaw, boundingRadius} = scene;
+    const {position, yaw} = scene;
+    const boundingRadius = scene.boundingSphere.radius;
     const goal = this.goalPosition;
     const oldScale = scene.scale.x;
     const box = this.placementBox!;
@@ -708,7 +709,7 @@ export class ARRenderer extends EventDispatcher {
         const offset = goal.y - y;
         if (this.placementComplete && this.placeOnWall === false) {
           box.offsetHeight = offset / newScale;
-          scene.setShadowScaleAndOffset(newScale, offset);
+          scene.setShadowOffset(offset);
         } else if (offset === 0) {
           this.placementComplete = true;
           box.show = false;
@@ -764,14 +765,9 @@ export class ARRenderer extends EventDispatcher {
         this.moveScene(delta);
         this.renderer.preRender(scene, time, delta);
         this.lastTick = time;
-      }
 
-      // TODO: This is a workaround for a Chrome bug, which should be fixed
-      // soon: https://bugs.chromium.org/p/chromium/issues/detail?id=1184085
-      const gl = this.threeRenderer.getContext();
-      gl.depthMask(false);
-      gl.clear(gl.DEPTH_BUFFER_BIT);
-      gl.depthMask(true);
+        scene.renderShadow(this.threeRenderer);
+      }
 
       this.threeRenderer.render(scene, scene.getCamera());
       isFirstView = false;

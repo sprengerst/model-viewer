@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import {ACESFilmicToneMapping, Event, EventDispatcher, PCFSoftShadowMap, sRGBEncoding, WebGLRenderer} from 'three';
+import {ACESFilmicToneMapping, Event, EventDispatcher, sRGBEncoding, WebGLRenderer} from 'three';
 
 import {$updateEnvironment} from '../features/environment.js';
 import {ModelViewerGlobalConfig} from '../features/loading.js';
@@ -147,9 +147,6 @@ export class Renderer extends EventDispatcher {
       this.threeRenderer.outputEncoding = sRGBEncoding;
       this.threeRenderer.physicallyCorrectLights = true;
       this.threeRenderer.setPixelRatio(1);  // handle pixel ratio externally
-      this.threeRenderer.shadowMap.enabled = true;
-      this.threeRenderer.shadowMap.type = PCFSoftShadowMap;
-      this.threeRenderer.shadowMap.autoUpdate = false;
 
       this.debugger = !!options.debug ? new Debugger(this) : null;
       this.threeRenderer.debug = {checkShaderErrors: !!this.debugger};
@@ -259,7 +256,26 @@ export class Renderer extends EventDispatcher {
       style.width = `${width}px`;
       style.height = `${height}px`;
       scene.queueRender();
+      this.dispatchRenderScale(scene);
     }
+  }
+
+  dispatchRenderScale(scene: ModelScene) {
+    const scale = this.scaleFactor;
+    const renderedDpr = this.dpr * scale;
+    const reason = scale < 1                 ? 'GPU throttling' :
+        this.dpr !== window.devicePixelRatio ? 'No meta viewport tag' :
+                                               '';
+    scene.element.dispatchEvent(new CustomEvent('render-scale', {
+      detail: {
+        reportedDpr: window.devicePixelRatio,
+        renderedDpr: renderedDpr,
+        minimumDpr: this.dpr * SCALE_STEPS[this.lastStep],
+        pixelWidth: Math.ceil(scene.width * renderedDpr),
+        pixelHeight: Math.ceil(scene.height * renderedDpr),
+        reason: reason
+      }
+    }));
   }
 
   registerScene(scene: ModelScene) {
@@ -277,6 +293,8 @@ export class Renderer extends EventDispatcher {
       canvas.classList.add('show');
     }
     scene.queueRender();
+
+    this.dispatchRenderScale(scene);
 
     if (this.canRender && this.scenes.size > 0) {
       this.threeRenderer.setAnimationLoop(
@@ -386,10 +404,6 @@ export class Renderer extends EventDispatcher {
     const exposureIsNumber =
         typeof exposure === 'number' && !(self as any).isNaN(exposure);
     this.threeRenderer.toneMappingExposure = exposureIsNumber ? exposure : 1.0;
-
-    if (scene.isShadowDirty()) {
-      this.threeRenderer.shadowMap.needsUpdate = true;
-    }
   }
 
   render(t: number, frame?: XRFrame) {
@@ -462,6 +476,8 @@ export class Renderer extends EventDispatcher {
       const height = Math.min(
           Math.ceil(scene.height * scaleFactor * dpr), this.canvas3D.height);
 
+      scene.renderShadow(this.threeRenderer);
+
       // Need to set the render target in order to prevent
       // clearing the depth from a different buffer
       this.threeRenderer.setRenderTarget(null);
@@ -522,6 +538,5 @@ export class Renderer extends EventDispatcher {
     for (const scene of this.scenes) {
       (scene.element as any)[$updateEnvironment]();
     }
-    this.threeRenderer.shadowMap.needsUpdate = true;
   };
 }

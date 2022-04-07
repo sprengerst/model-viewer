@@ -74,6 +74,9 @@ export class ModelViewerGLTFInstance extends GLTFInstance {
         }
 
         const material = mesh.material as MeshStandardMaterial;
+        if ((material as any).isMeshBasicMaterial === true) {
+          material.toneMapped = false;
+        }
         // This makes shadows better for non-manifold meshes
         material.shadowSide = FrontSide;
       }

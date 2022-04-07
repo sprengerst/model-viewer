@@ -15,10 +15,9 @@
 
 import {Camera, Vector3} from 'three';
 
-import {$controls, $promptAnimatedContainer, $promptElement, CameraChangeDetails, cameraOrbitIntrinsics, ControlsInterface, ControlsMixin, INTERACTION_PROMPT, SphericalPosition} from '../../features/controls.js';
-import ModelViewerElementBase, {$canvas, $scene, $userInputElement, Vector3D} from '../../model-viewer-base.js';
+import {$controls, $promptAnimatedContainer, $promptElement, CameraChangeDetails, cameraOrbitIntrinsics, ControlsInterface, ControlsMixin, INTERACTION_PROMPT, OLD_DEFAULT_FOV_DEG, SphericalPosition} from '../../features/controls.js';
+import ModelViewerElementBase, {$canvas, $scene, $statusElement, $userInputElement, Vector3D} from '../../model-viewer-base.js';
 import {StyleEvaluator} from '../../styles/evaluators.js';
-import {DEFAULT_FOV_DEG} from '../../three-components/ModelScene.js';
 import {ChangeSource, SmoothControls} from '../../three-components/SmoothControls.js';
 import {Constructor, step, timePasses, waitForEvent} from '../../utilities.js';
 import {assetPath, dispatchSyntheticEvent, rafPasses, until} from '../helpers.js';
@@ -325,7 +324,7 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
           await timePasses();
           settleControls(controls);
           expect(element.getFieldOfView())
-              .to.be.closeTo(DEFAULT_FOV_DEG, 0.001);
+              .to.be.closeTo(OLD_DEFAULT_FOV_DEG, 0.001);
         });
 
         test('jumps to maxCameraOrbit when outside', async () => {
@@ -574,10 +573,12 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
       suite('a11y', () => {
         let input: HTMLDivElement;
         let promptElement: HTMLElement;
+        let statusElement: HTMLSpanElement;
 
         setup(async () => {
           input = element[$userInputElement];
           promptElement = (element as any)[$promptElement];
+          statusElement = element[$statusElement];
           element.alt = 'A 3D model of a cube';
           element.cameraOrbit = '0 90deg auto';
         });
@@ -589,14 +590,15 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
           });
 
           test('has initial aria-label set to alt before interaction', () => {
-            expect(input.getAttribute('aria-label')).to.be.equal(element.alt);
+            expect(input.getAttribute('aria-label')).to.include(element.alt);
           });
 
           test.skip('prompts user to interact when focused', async () => {
             input.focus();
 
             await until(
-                () => input.getAttribute('aria-label') === INTERACTION_PROMPT);
+                () => !!input.getAttribute('aria-label')
+                            ?.includes(INTERACTION_PROMPT));
 
             expect(promptElement.classList.contains('visible'))
                 .to.be.equal(true);
@@ -639,7 +641,7 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
             await timePasses(element.interactionPromptThreshold + 100);
 
             expect(input.getAttribute('aria-label'))
-                .to.not.be.equal(INTERACTION_PROMPT);
+                .to.include(INTERACTION_PROMPT);
             expect(promptElement.classList.contains('visible'))
                 .to.be.equal(false);
           });
@@ -654,25 +656,25 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
               controls.setOrbit(-Math.PI / 2.0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage left');
 
               controls.setOrbit(Math.PI / 2.0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage right');
 
               controls.adjustOrbit(-Math.PI / 2.0, 0, 0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage back');
 
               controls.adjustOrbit(Math.PI, 0, 0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage front');
             });
 
@@ -687,19 +689,19 @@ suite('ModelViewerElementBase with ControlsMixin', () => {
               controls.setOrbit(0, 0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage upper-front');
 
               controls.adjustOrbit(0, -Math.PI / 2.0, 0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage front');
 
               controls.adjustOrbit(0, -Math.PI / 2.0, 0);
               settleControls(controls);
 
-              expect(input.getAttribute('aria-label'))
+              expect(statusElement.textContent)
                   .to.be.equal('View from stage lower-front');
             });
       });

@@ -47,6 +47,11 @@
   left: 8px;
 }
 
+#texture-name,
+#image-name {
+  font-size: 0.8em;
+}
+
 button {
   font-size: 1.3em;
   margin: 0 0.25em;
@@ -314,7 +319,7 @@ modelViewerParameters.addEventListener("load", (ev) => {
           </div>
           <example-snippet stamp-to="createTexturesExample" highlight-as="html">
             <template>
-<model-viewer id="duck" camera-controls src="../../shared-assets/models/glTF-Sample-Models/2.0/Duck/glTF-Binary/Duck.glb" ar ar-modes="webxr scene-viewer quick-look" alt="A 3D model of a helmet">
+<model-viewer id="duck" camera-controls src="../../shared-assets/models/glTF-Sample-Models/2.0/Duck/glTF-Binary/Duck.glb" ar ar-modes="webxr scene-viewer quick-look" alt="A 3D model of a duck">
   <div class="controls">
       <p>Normals</p>
       <select id="normals2">
@@ -323,6 +328,10 @@ modelViewerParameters.addEventListener("load", (ev) => {
         <option value="../../shared-assets/models/glTF-Sample-Models/2.0/Lantern/glTF/Lantern_normal.png">Lantern Pole</option>
         <option value="../../shared-assets/models/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle_normal.png">Water Bottle</option>
       </select>
+      <p>Custom texture name</p>
+      <p id="texture-name">None</p>
+      <p>Image name from file name</p>
+      <p id="image-name">None</p>
     </div>
 </model-viewer>
 <script type="module">
@@ -339,8 +348,13 @@ modelViewerTexture.addEventListener("load", () => {
     } else if (event.target.value) {
       // Creates a new texture.
       const texture = await modelViewerTexture.createTexture(event.target.value);
+      // Set the texture name
+      texture.name = event.target.options[event.target.selectedIndex].text.replace(/ /g, "_").toLowerCase();
       // Applies the new texture to the specified channel.
       material[channel].setTexture(texture);
+      // Display the names values
+      document.querySelector('#texture-name').innerText = texture.name;
+      document.querySelector('#image-name').innerText = texture.source.name;
     }
   }
 
@@ -413,14 +427,14 @@ modelViewerTexture.addEventListener("load", () => {
   </div>
 </model-viewer>
 <script type="module">
-const modelViewerTexture = document.querySelector("model-viewer#helmet");
+const modelViewerTexture1 = document.querySelector("model-viewer#helmet");
 
-modelViewerTexture.addEventListener("load", () => {
+modelViewerTexture1.addEventListener("load", () => {
 
-  const material = modelViewerTexture.model.materials[0];
+  const material = modelViewerTexture1.model.materials[0];
 
   const createAndApplyTexture = async (channel, event) => {
-    const texture = await modelViewerTexture.createTexture(event.target.value);
+    const texture = await modelViewerTexture1.createTexture(event.target.value);
     if (channel.includes('base') || channel.includes('metallic')) {
       material.pbrMetallicRoughness[channel].setTexture(texture);
     } else {
@@ -467,7 +481,7 @@ modelViewerTexture.addEventListener("load", () => {
           </div>
           <example-snippet stamp-to="pickMaterialExample" highlight-as="html">
             <template>
-<model-viewer id="pickMaterial" camera-controls src="../../shared-assets/models/glTF-Sample-Models/2.0/Buggy/glTF-Binary/Buggy.glb" ar ar-modes="webxr scene-viewer" scale="0.001 0.001 0.001" alt="A Material Picking Example">
+<model-viewer id="pickMaterial" shadow-intensity="1" camera-controls src="../../shared-assets/models/glTF-Sample-Models/2.0/Buggy/glTF-Binary/Buggy.glb" ar ar-modes="webxr scene-viewer" scale="0.001 0.001 0.001" alt="A Material Picking Example">
 </model-viewer>
 <script type="module">
 const modelViewer = document.querySelector("model-viewer#pickMaterial");

@@ -21,7 +21,7 @@ import {PreloadEvent} from '../three-components/CachingGLTFLoader.js';
 import {EnvironmentMapAndSkybox} from '../three-components/TextureUtils.js';
 import {Constructor, deserializeUrl} from '../utilities.js';
 
-export const BASE_OPACITY = 0.1;
+export const BASE_OPACITY = 0.5;
 const DEFAULT_SHADOW_INTENSITY = 0.0;
 const DEFAULT_SHADOW_SOFTNESS = 1.0;
 const DEFAULT_EXPOSURE = 1.0;
@@ -38,6 +38,7 @@ export declare interface EnvironmentInterface {
   shadowIntensity: number;
   shadowSoftness: number;
   exposure: number;
+  hasBakedShadow(): boolean;
 }
 
 export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
@@ -103,6 +104,10 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
           this[$shouldAttemptPreload]()) {
         this[$updateEnvironment]();
       }
+    }
+
+    hasBakedShadow(): boolean {
+      return this[$scene].bakedShadows.length > 0;
     }
 
     [$onModelLoad]() {
