@@ -590,7 +590,7 @@ export class SmoothControls extends EventDispatcher {
 
         // console.warn('differenceYToLast', differenceYToLast);
 
-        if (this.isUserChange && dyMag > dxMag && differenceYToLast > 18) {
+        if (this.isUserChange && dyMag > dxMag && differenceYToLast > 14) {
           // console.warn('dy > dx && differenceYToLast > 20');
           this.touchMode = null;
           return;
