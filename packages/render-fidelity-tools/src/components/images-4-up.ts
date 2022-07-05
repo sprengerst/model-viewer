@@ -16,10 +16,10 @@
 import '../image-accessor.js';
 import './magnifying-glass.js';
 
-import {html, LitElement, property} from 'lit-element';
+import {html, LitElement} from 'lit';
+import {property} from 'lit/decorators.js';
 
 import {Dimensions, Pixel, Rect} from '../common.js';
-
 import {ImageAccessor} from '../image-accessor.js';
 
 

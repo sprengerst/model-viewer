@@ -1,6 +1,6 @@
 {
   "name": "@google/model-viewer",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Easily display interactive 3D models on the web and in AR!",
   "repository": "https://github.com/google/model-viewer",
   "bugs": {
@@ -36,6 +36,7 @@
   "scripts": {
     "run:first:build:tsc": "tsc --incremental",
     "run:second:build:rollup": "rollup -c --environment NODE_ENV:production",
+    "combined:build": "npm run run:first:build:tsc && npm run run:second:build:rollup",
     "clean": "rm -rf ./lib ./dist",
     "prepare": "",
     "build": "npm run build:tsc && npm run build:rollup",
@@ -69,9 +70,8 @@
     "3d"
   ],
   "dependencies": {
-    "three": "^0.139.2",
-    "lit-element": "^2.5.1",
-    "lit-html": "^1.4.1"
+    "three": "^0.140.2",
+    "lit": "^2.2.3"
   },
   "devDependencies": {
     "@open-wc/karma-esm": "^4.0.0",
@@ -81,7 +81,7 @@
     "@types/chai": "^4.2.21",
     "@types/mocha": "^8.2.3",
     "@types/pngjs": "^6.0.1",
-    "@types/three": "^0.137.0",
+    "@types/three": "^0.139.0",
     "@ungap/event-target": "^0.2.2",
     "chai": "^4.3.4",
     "focus-visible": "^5.2.0",
