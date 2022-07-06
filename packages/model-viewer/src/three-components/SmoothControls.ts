@@ -567,12 +567,12 @@ export class SmoothControls extends EventDispatcher {
     event.preventDefault();
   };
 
-  private touchModeRotate: TouchMode = (dx: number, dy: number, _eventDx: number, eventDy: number) => {
+  private touchModeRotate: TouchMode = (dx: number, dy: number, eventDx: number, eventDy: number) => {
     const {touchAction} = this._options;
     if (!this.touchDecided && touchAction !== 'none') {
       this.touchDecided = true;
-      const dxMag = Math.abs(dx);
-      const dyMag = Math.abs(dy);
+      // const dxMag = Math.abs(dx);
+      // const dyMag = Math.abs(dy);
       // If motion is mostly vertical, assume scrolling is the intent.
 
       const isMobile =
@@ -587,11 +587,13 @@ export class SmoothControls extends EventDispatcher {
         // console.warn('lastPointerPosition', this.lastPointerPosition);
 
         const differenceYToLast = !(this.lastPointerPosition.clientY === 0 && this.lastPointerPosition.clientX === 0)? Math.abs(eventDy - this.lastPointerPosition.clientY) : 0;
+        const differenceXToLast = !(this.lastPointerPosition.clientX === 0 && this.lastPointerPosition.clientY === 0)? Math.abs(eventDx - this.lastPointerPosition.clientX) : 0;
 
         // console.warn('differenceYToLast', differenceYToLast);
+        // console.warn('differenceXToLast', differenceXToLast);
 
-        if (this.isUserChange && dyMag > dxMag && differenceYToLast > 14) {
-          // console.warn('dy > dx && differenceYToLast > 20');
+        if (this.isUserChange && differenceYToLast > differenceXToLast && differenceYToLast > 100) {
+          // console.warn('dy > dx && differenceYToLast > 50');
           this.touchMode = null;
           return;
         } else {
