@@ -8,10 +8,6 @@
         "name": "Display Poster"
       },
       {
-        "htmlId": "preload",
-        "name": "Preload"
-      },
-      {
         "htmlId": "customizeLoad",
         "name": "Customize Load"
       },
@@ -121,7 +117,7 @@
       },
       {
         "htmlId": "panning",
-        "name": "Panning"
+        "name": "Disable Tap"
       },
       {
         "htmlId": "turnSkybox",
@@ -146,6 +142,10 @@
         "name": "Dimensions"
       },
       {
+        "htmlId": "overlays",
+        "name": "Custom Overlays"
+      },
+      {
         "htmlId": "cameraViews",
         "name": "Camera Views"
       }
@@ -156,7 +156,7 @@
     "htmlName": "lightingandenv",
     "examples": [
       {
-        "htmlId": "hdrSkyboyImage",
+        "htmlId": "hdrSkyboxImage",
         "name": "HDR skybox-image"
       },
       {
@@ -192,7 +192,7 @@
         "name": "LDR environment-image"
       },
       {
-        "htmlId": "skyboxAndEnvrionment",
+        "htmlId": "skyboxAndEnvironment",
         "name": "Skybox and Environment"
       }
     ]
