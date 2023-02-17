@@ -309,6 +309,7 @@ configuration or device capabilities');
       const location = self.location.toString();
       const locationUrl = new URL(location);
       const modelUrl = new URL(this.src!, location);
+      if( modelUrl.hash ) modelUrl.hash = '';
       const params = new URLSearchParams(modelUrl.search);
 
       locationUrl.hash = noArViewerSigil;
