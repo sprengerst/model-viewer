@@ -127,6 +127,8 @@ export interface PointerChangeEvent extends ThreeEvent {
  */
 export class SmoothControls extends EventDispatcher {
   public orbitSensitivity = 1;
+  public zoomSensitivity = 1;
+  public panSensitivity = 1;
   public inputSensitivity = 1;
   public changeSource = ChangeSource.NONE;
 
@@ -531,7 +533,7 @@ export class SmoothControls extends EventDispatcher {
     if (!this._disableZoom) {
       const touchDistance =
           this.twoTouchDistance(this.pointers[0], this.pointers[1]);
-      const deltaZoom = ZOOM_SENSITIVITY *
+      const deltaZoom = ZOOM_SENSITIVITY * this.zoomSensitivity *
           (this.lastSeparation - touchDistance) * 50 / this.scene.height;
       this.lastSeparation = touchDistance;
 
@@ -614,7 +616,7 @@ export class SmoothControls extends EventDispatcher {
   private initializePan() {
     const {theta, phi} = this.spherical;
     const psi = theta - this.scene.yaw;
-    this.panPerPixel = PAN_SENSITIVITY / this.scene.height;
+    this.panPerPixel = PAN_SENSITIVITY * this.panSensitivity / this.scene.height;
     this.panProjection.set(
         -Math.cos(psi),
         -Math.cos(phi) * Math.sin(psi),
@@ -884,7 +886,7 @@ export class SmoothControls extends EventDispatcher {
     }
 
     const deltaZoom = (event as WheelEvent).deltaY *
-        ((event as WheelEvent).deltaMode == 1 ? 18 : 1) * ZOOM_SENSITIVITY / 30;
+        ((event as WheelEvent).deltaMode == 1 ? 18 : 1) * ZOOM_SENSITIVITY * this.zoomSensitivity / 30;
     this.userAdjustOrbit(0, 0, deltaZoom);
 
     event.preventDefault();
@@ -937,10 +939,10 @@ export class SmoothControls extends EventDispatcher {
     let relevantKey = true;
     switch (event.key) {
       case 'PageUp':
-        this.userAdjustOrbit(0, 0, ZOOM_SENSITIVITY);
+        this.userAdjustOrbit(0, 0, ZOOM_SENSITIVITY * this.zoomSensitivity);
         break;
       case 'PageDown':
-        this.userAdjustOrbit(0, 0, -1 * ZOOM_SENSITIVITY);
+        this.userAdjustOrbit(0, 0, -1 * ZOOM_SENSITIVITY * this.zoomSensitivity);
         break;
       case 'ArrowUp':
         this.userAdjustOrbit(0, -KEYBOARD_ORBIT_INCREMENT, 0);
