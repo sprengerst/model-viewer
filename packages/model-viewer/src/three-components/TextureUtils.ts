@@ -49,6 +49,7 @@ export default class TextureUtils extends EventDispatcher {
   private blurMaterial: ShaderMaterial|null = null;
   private blurScene: Scene|null = null;
 
+
   constructor(private threeRenderer: WebGLRenderer) {
     super();
   }
@@ -100,10 +101,14 @@ export default class TextureUtils extends EventDispatcher {
   }
 
   async loadEquirect(
-      url: string, progressCallback: (progress: number) => void = () => {}):
+      url: string,
+      hdrType: string|null = null,
+      progressCallback: (progress: number) => void = () => {}):
       Promise<Texture> {
     try {
-      const isHDR: boolean = HDR_FILE_RE.test(url);
+      const isHDR: boolean = hdrType === 'hdr' || HDR_FILE_RE.test(url);
+      console.log('isHDR', {isHDR: isHDR});
+
       const loader = isHDR ? this.hdrLoader : this.ldrLoader;
       const texture: Texture = await new Promise<Texture>(
           (resolve, reject) => loader.load(
@@ -135,7 +140,7 @@ export default class TextureUtils extends EventDispatcher {
    * is a Texture from a WebGLRenderCubeTarget.
    */
   async generateEnvironmentMapAndSkybox(
-      skyboxUrl: string|null = null, environmentMapUrl: string|null = null,
+      skyboxUrl: string|null = null, environmentMapUrl: string|null = null, hdrType: string|null = null,
       progressCallback: (progress: number) => void = () => {}):
       Promise<EnvironmentMapAndSkybox> {
     const useAltEnvironment = environmentMapUrl !== 'legacy';
@@ -149,17 +154,17 @@ export default class TextureUtils extends EventDispatcher {
 
     // If we have a skybox URL, attempt to load it as a cubemap
     if (!!skyboxUrl) {
-      skyboxLoads = this.loadEquirectFromUrl(skyboxUrl, progressCallback);
+      skyboxLoads = this.loadEquirectFromUrl(skyboxUrl, hdrType, progressCallback);
     }
 
     if (!!environmentMapUrl) {
       // We have an available environment map URL
       environmentMapLoads =
-          this.loadEquirectFromUrl(environmentMapUrl, progressCallback);
+          this.loadEquirectFromUrl(environmentMapUrl,hdrType, progressCallback);
     } else if (!!skyboxUrl) {
       // Fallback to deriving the environment map from an available skybox
       environmentMapLoads =
-          this.loadEquirectFromUrl(skyboxUrl, progressCallback);
+          this.loadEquirectFromUrl(skyboxUrl, hdrType, progressCallback);
     } else {
       // Fallback to generating the environment map
       environmentMapLoads = useAltEnvironment ?
@@ -182,9 +187,10 @@ export default class TextureUtils extends EventDispatcher {
    */
   private async loadEquirectFromUrl(
       url: string,
+      hdrType: string|null = null,
       progressCallback: (progress: number) => void): Promise<Texture> {
     if (!this.skyboxCache.has(url)) {
-      const skyboxMapLoads = this.loadEquirect(url, progressCallback);
+      const skyboxMapLoads = this.loadEquirect(url, hdrType, progressCallback);
 
       this.skyboxCache.set(url, skyboxMapLoads);
     }

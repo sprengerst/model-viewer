@@ -44,6 +44,9 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
     @property({type: String, attribute: 'environment-image'})
     environmentImage: string|null = null;
 
+    @property({type: String, attribute: 'hdr-type'})
+    hdrType: string|null = null;
+
     @property({type: String, attribute: 'skybox-image'})
     skyboxImage: string|null = null;
 
@@ -113,6 +116,7 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
             await textureUtils.generateEnvironmentMapAndSkybox(
                 deserializeUrl(skyboxImage),
                 environmentImage,
+                this.hdrType,
                 (progress: number) => updateEnvProgress(clamp(progress, 0, 1)));
 
         if (this[$currentEnvironmentMap] !== environmentMap) {
