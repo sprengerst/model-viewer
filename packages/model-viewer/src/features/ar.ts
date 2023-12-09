@@ -146,6 +146,7 @@ export const ARMixin = <T extends Constructor<ModelViewerElementBase>>(
       }
     };
 
+
     connectedCallback() {
       super.connectedCallback();
 
@@ -189,6 +190,121 @@ export const ARMixin = <T extends Constructor<ModelViewerElementBase>>(
           changedProperties.has('src') || changedProperties.has('iosSrc')) {
         this[$selectARMode]();
       }
+    }
+
+    hashCode(str: any) {
+
+      let m = 0x5bd1e995;
+      let r = 24;
+      let h = [0, 0, 0, 0];
+      let k;
+      for (let i = 0; i < str.length; i += 4) {
+        k = str.charCodeAt(i) + (str.charCodeAt(i + 1) << 8) + (str.charCodeAt(i + 2) << 16) + (str.charCodeAt(i + 3) << 24);
+        k *= m;
+        k ^= k >>> r;
+        k *= m;
+        h[0] *= m;
+        h[0] ^= k;
+        h[1] *= m;
+        h[1] ^= k >>> 16;
+        h[2] *= m;
+        h[2] ^= k >>> 32;
+        h[3] *= m;
+        h[3] ^= k >>> 48;
+      }
+      k = 0;
+      // @ts-ignore
+      switch (str.length & 3) {
+        // @ts-ignore
+        case 3: k ^= (str.charCodeAt(str.length - 1) << 16);
+        // @ts-ignore
+        case 2: k ^= (str.charCodeAt(str.length - 2) << 8);
+        case 1: k ^= str.charCodeAt(str.length - 3);
+          k *= m;
+          k ^= k >>> r;
+          k *= m;
+          h[0] *= m;
+          h[0] ^= k;
+          h[1] *= m;
+          h[1] ^= k >>> 16;
+          h[2] *= m;
+          h[2] ^= k >>> 32;
+          h[3] *= m;
+          h[3] ^= k >>> 48;
+      }
+      h[0] ^= str.length;
+      h[1] ^= str.length >>> 16;
+      h[2] ^= str.length >>> 32;
+      h[3] ^= str.length >>> 48;
+      h[0] *= m;
+      h[1] *= m;
+      h[2] *= m;
+      h[3] *= m;
+      h[0] ^= h[0] >>> 13;
+      h[1] ^= h[1] >>> 13;
+      h[2] ^= h[2] >>> 13;
+      h[3] ^= h[3] >>> 13;
+      h[0] *= m;
+      h[1] *= m;
+      h[2] *= m;
+      h[3] *= m;
+      h[0] ^= h[0] >>> 15;
+      h[1] ^= h[1] >>> 15;
+      h[2] ^= h[2] >>> 15;
+      h[3] ^= h[3] >>> 15;
+      return (h[0] >>> 0).toString(16) + (h[1] >>> 0).toString(16) + (h[2] >>> 0).toString(16) + (h[3] >>> 0).toString(16);
+    }
+
+
+    obfuscate(projectUID: any, user: any) {
+      let a = 'OPgfospodfO_' + 'KXCJ213*' + 'const 5000:int';
+      let b = 'UguZDBSgtvf-' + 'scriptCaller()' + 'globalThis.runmode=3';
+      let c = user;
+      let d = projectUID;
+      let e = this.getDayOfYear();
+
+      let f = '';
+
+      let switchVar = 0;
+
+      while (true) {
+        switch (switchVar) {
+          case 0:
+            f += a;
+            switchVar = 1;
+            break;
+          case 1:
+            f += b;
+            switchVar = 2;
+            break;
+          case 2:
+            f += c;
+            switchVar = 3;
+            break;
+          case 3:
+            f += d;
+            switchVar = 4;
+            break;
+          case 4:
+            f += e;
+            switchVar = 0;
+            break;
+        }
+        if (switchVar === 0) {
+          break;
+        }
+      }
+
+      return f;
+    }
+
+    getDayOfYear() {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      // @ts-ignore
+      const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+      const oneDay = 1000 * 60 * 60 * 24;
+      return Math.floor(diff / oneDay);
     }
 
     /**
@@ -341,6 +457,24 @@ configuration or device capabilities');
         fallBackUrlFinished = encodeURIComponent(locationUrl.toString());
       }
 
+      let sessionParams = new URLSearchParams(modelUrl.search);
+      sessionParams.delete('session');
+      sessionParams.delete('user');
+
+      const parts = modelUrl.toString().split('/');
+      const PROJECT_UID = parts[3];
+
+      const SESSION_ID = new Date().getTime() + 'X';
+      const SESSION_VALUE = this.hashCode(this.obfuscate(PROJECT_UID, SESSION_ID));
+
+      sessionParams.append('session', SESSION_VALUE);
+      sessionParams.append('user', SESSION_ID);
+      modelUrl.search = sessionParams.toString();
+
+      // console.error('SESSION URL', modelUrl.toString());
+      // console.error('PROJECT_UID',PROJECT_UID);
+
+      // @ts-ignore
       const intent = `intent://arvr.google.com/scene-viewer/1.0?${
           params.toString() + '&file=' +
           encodeURIComponent(
