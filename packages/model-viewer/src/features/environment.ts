@@ -14,7 +14,7 @@
  */
 
 import {property} from 'lit/decorators.js';
-import {Texture} from 'three';
+import {ACESFilmicToneMapping, AgXToneMapping, CustomToneMapping, Texture} from 'three';
 
 import ModelViewerElementBase, {$needsRender, $progressTracker, $renderer, $scene, $shouldAttemptPreload} from '../model-viewer-base.js';
 import {clamp, Constructor, deserializeUrl} from '../utilities.js';
@@ -24,6 +24,8 @@ const DEFAULT_SHADOW_INTENSITY = 0.0;
 const DEFAULT_SHADOW_SOFTNESS = 1.0;
 const DEFAULT_EXPOSURE = 1.0;
 
+export type ToneMappingValue = 'auto'|'aces'|'agx'|'commerce';
+
 export const $currentEnvironmentMap = Symbol('currentEnvironmentMap');
 export const $currentBackground = Symbol('currentBackground');
 export const $updateEnvironment = Symbol('updateEnvironment');
@@ -32,6 +34,7 @@ const $cancelEnvironmentUpdate = Symbol('cancelEnvironmentUpdate');
 export declare interface EnvironmentInterface {
   environmentImage: string|null;
   skyboxImage: string|null;
+  skyboxHeight: string;
   shadowIntensity: number;
   shadowSoftness: number;
   exposure: number;
@@ -56,10 +59,13 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
     @property({type: Number, attribute: 'shadow-softness'})
     shadowSoftness: number = DEFAULT_SHADOW_SOFTNESS;
 
-    @property({
-      type: Number,
-    })
-    exposure: number = DEFAULT_EXPOSURE;
+    @property({type: Number}) exposure: number = DEFAULT_EXPOSURE;
+
+    @property({type: String, attribute: 'tone-mapping'})
+    toneMapping: ToneMappingValue = 'auto';
+
+    @property({type: String, attribute: 'skybox-height'})
+    skyboxHeight: string = '0';
 
     protected[$currentEnvironmentMap]: Texture|null = null;
     protected[$currentBackground]: Texture|null = null;
@@ -84,10 +90,23 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
         this[$needsRender]();
       }
 
+      if (changedProperties.has('toneMapping')) {
+        this[$scene].toneMapping = this.toneMapping === 'commerce' ?
+            CustomToneMapping :
+            this.toneMapping === 'agx' ? AgXToneMapping :
+                                         ACESFilmicToneMapping;
+        this[$needsRender]();
+      }
+
       if ((changedProperties.has('environmentImage') ||
            changedProperties.has('skyboxImage')) &&
           this[$shouldAttemptPreload]()) {
         this[$updateEnvironment]();
+      }
+
+      if (changedProperties.has('skyboxHeight')) {
+        this[$scene].setGroundedSkybox();
+        this[$needsRender]();
       }
     }
 
@@ -109,7 +128,7 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
         return;
       }
 
-      const updateEnvProgress = this[$progressTracker].beginActivity();
+      const updateEnvProgress = this[$progressTracker].beginActivity('environment-update');
 
       try {
         const {environmentMap, skybox} =
@@ -134,7 +153,6 @@ export const EnvironmentMixin = <T extends Constructor<ModelViewerElementBase>>(
 
         this[$scene].setEnvironmentAndSkybox(
             this[$currentEnvironmentMap], this[$currentBackground]);
-        this[$scene].dispatchEvent({type: 'envmap-update'});
       } catch (errorOrPromise) {
         if (errorOrPromise instanceof Error) {
           this[$scene].setEnvironmentAndSkybox(null, null);

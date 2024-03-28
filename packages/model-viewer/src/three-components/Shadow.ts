@@ -18,7 +18,7 @@ import {HorizontalBlurShader} from 'three/examples/jsm/shaders/HorizontalBlurSha
 import {VerticalBlurShader} from 'three/examples/jsm/shaders/VerticalBlurShader.js';
 import {lerp} from 'three/src/math/MathUtils.js';
 
-import {ModelScene} from './ModelScene';
+import {ModelScene} from './ModelScene.js';
 
 export type Side = 'back'|'bottom';
 
@@ -91,7 +91,7 @@ export class Shadow extends Object3D {
       side: BackSide,
     });
     this.floor = new Mesh(plane, shadowMaterial);
-    this.floor.userData.shadow = true;
+    this.floor.userData.noHit = true;
     camera.add(this.floor);
 
     // the plane onto which to blur the texture
@@ -264,7 +264,11 @@ export class Shadow extends Object3D {
    * z-fighting with any baked-in shadow plane.
    */
   setOffset(offset: number) {
-    this.floor.position.z = -offset + 0.001 * this.maxDimension;
+    this.floor.position.z = -offset + this.gap();
+  }
+
+  gap() {
+    return 0.001 * this.maxDimension;
   }
 
   render(renderer: WebGLRenderer, scene: Scene) {

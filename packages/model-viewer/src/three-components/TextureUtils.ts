@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-import {BackSide, BoxGeometry, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EventDispatcher, HalfFloatType, LinearSRGBColorSpace, Loader, Mesh, NoBlending, NoToneMapping, RGBAFormat, Scene, ShaderMaterial, sRGBEncoding, Texture, TextureLoader, Vector3, WebGLCubeRenderTarget, WebGLRenderer} from 'three';
+import {GainMapDecoderMaterial, HDRJPGLoader, QuadRenderer} from '@monogrid/gainmap-js';
+import {BackSide, BoxGeometry, CubeCamera, CubeTexture, DataTexture, EquirectangularReflectionMapping, HalfFloatType, LinearSRGBColorSpace, Loader, Mesh, NoBlending, NoToneMapping, RGBAFormat, Scene, ShaderMaterial, SRGBColorSpace, Texture, TextureLoader, Vector3, WebGLCubeRenderTarget, WebGLRenderer} from 'three';
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js';
 
 import {deserializeUrl, timePasses} from '../utilities.js';
 
 import EnvironmentScene from './EnvironmentScene.js';
-import EnvironmentSceneAlt from './EnvironmentSceneAlt.js';
 
 export interface EnvironmentMapAndSkybox {
   environmentMap: Texture;
@@ -33,11 +33,12 @@ const MAX_SAMPLES = 20;
 
 const HDR_FILE_RE = /\.hdr(\.js)?$/;
 
-export default class TextureUtils extends EventDispatcher {
+export default class TextureUtils {
   public lottieLoaderUrl = '';
   public withCredentials = false;
 
   private _ldrLoader: TextureLoader|null = null;
+  private _imageLoader: HDRJPGLoader|null = null;
   private _hdrLoader: RGBELoader|null = null;
   private _lottieLoader: Loader|null = null;
 
@@ -51,7 +52,6 @@ export default class TextureUtils extends EventDispatcher {
 
 
   constructor(private threeRenderer: WebGLRenderer) {
-    super();
   }
 
   get ldrLoader(): TextureLoader {
@@ -60,6 +60,14 @@ export default class TextureUtils extends EventDispatcher {
     }
     this._ldrLoader.setWithCredentials(this.withCredentials);
     return this._ldrLoader;
+  }
+
+  get imageLoader(): HDRJPGLoader {
+    if (this._imageLoader == null) {
+      this._imageLoader = new HDRJPGLoader(this.threeRenderer);
+    }
+    this._imageLoader.setWithCredentials(this.withCredentials);
+    return this._imageLoader;
   }
 
   get hdrLoader(): RGBELoader {
@@ -73,7 +81,8 @@ export default class TextureUtils extends EventDispatcher {
 
   async getLottieLoader(): Promise<any> {
     if (this._lottieLoader == null) {
-      const {LottieLoader} = await import(/* webpackIgnore: true */ this.lottieLoaderUrl);
+      const {LottieLoader} =
+          await import(/* webpackIgnore: true */ this.lottieLoaderUrl);
       this._lottieLoader = new LottieLoader() as Loader;
     }
     this._lottieLoader.setWithCredentials(this.withCredentials);
@@ -109,12 +118,25 @@ export default class TextureUtils extends EventDispatcher {
       const isHDR: boolean = hdrType === 'hdr' || HDR_FILE_RE.test(url);
       console.log('isHDR', {isHDR: isHDR});
 
-      const loader = isHDR ? this.hdrLoader : this.ldrLoader;
+      const loader = isHDR ? this.hdrLoader : this.imageLoader;
       const texture: Texture = await new Promise<Texture>(
           (resolve, reject) => loader.load(
-              url, resolve, (event: {loaded: number, total: number}) => {
+              url,
+              (result) => {
+                const {renderTarget} =
+                    result as QuadRenderer<1016, GainMapDecoderMaterial>;
+                if (renderTarget != null) {
+                  const {texture} = renderTarget;
+                  result.dispose(false);
+                  resolve(texture);
+                } else {
+                  resolve(result as DataTexture);
+                }
+              },
+              (event: {loaded: number, total: number}) => {
                 progressCallback(event.loaded / event.total * 0.9);
-              }, reject));
+              },
+              reject));
 
       progressCallback(1.0);
 
@@ -122,7 +144,7 @@ export default class TextureUtils extends EventDispatcher {
       texture.mapping = EquirectangularReflectionMapping;
 
       if (!isHDR) {
-        texture.encoding = sRGBEncoding;
+        texture.colorSpace = SRGBColorSpace;
       }
 
       return texture;
@@ -234,7 +256,7 @@ export default class TextureUtils extends EventDispatcher {
   private async loadGeneratedEnvironmentMap(): Promise<CubeTexture> {
     if (this.generatedEnvironmentMap == null) {
       this.generatedEnvironmentMap =
-          this.GenerateEnvironmentMap(new EnvironmentScene(), 'legacy');
+          this.GenerateEnvironmentMap(new EnvironmentScene('legacy'), 'legacy');
     }
     return this.generatedEnvironmentMap;
   }
@@ -246,8 +268,8 @@ export default class TextureUtils extends EventDispatcher {
    */
   private async loadGeneratedEnvironmentMapAlt(): Promise<CubeTexture> {
     if (this.generatedEnvironmentMapAlt == null) {
-      this.generatedEnvironmentMapAlt =
-          this.GenerateEnvironmentMap(new EnvironmentSceneAlt(), 'neutral');
+      this.generatedEnvironmentMapAlt = this.GenerateEnvironmentMap(
+          new EnvironmentScene('neutral'), 'neutral');
     }
     return this.generatedEnvironmentMapAlt;
   }

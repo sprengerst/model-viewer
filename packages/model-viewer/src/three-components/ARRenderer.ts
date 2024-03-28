@@ -77,7 +77,8 @@ const matrix4 = new Matrix4();
 const hitPosition = new Vector3();
 const camera = new PerspectiveCamera(45, 1, 0.1, 100);
 
-export class ARRenderer extends EventDispatcher {
+export class ARRenderer extends EventDispatcher<
+    {status: {status: ARStatus}, tracking: {status: ARTracking}}> {
   public threeRenderer: WebGLRenderer;
   public currentSession: XRSession|null = null;
   public placeOnWall = false;
@@ -225,7 +226,7 @@ export class ARRenderer extends EventDispatcher {
     this.goalYaw = scene.yaw;
     this.goalScale = 1;
 
-    scene.background = null;
+    scene.setBackground(null);
 
     this.oldShadowIntensity = scene.shadowIntensity;
     scene.setShadowIntensity(0.01);  // invisible, but not changing the shader
