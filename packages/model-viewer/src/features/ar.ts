@@ -300,7 +300,7 @@ export const ARMixin = <T extends Constructor<ModelViewerElementBase>>(
 
     getDayOfYear() {
       const now = new Date();
-      const start = new Date(now.getFullYear(), 0, 0);
+      const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
       // @ts-ignore
       const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
       const oneDay = 1000 * 60 * 60 * 24;
