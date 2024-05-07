@@ -41,7 +41,7 @@ export class CacheEvictionPolicy<T = string> {
   private[$evictionThreshold]: number;
   private[$cache]: MutableCache<T>;
 
-  constructor(cache: MutableCache<T>, evictionThreshold: number = 5) {
+  constructor(cache: MutableCache<T>, evictionThreshold: number = 0) {
     this[$cache] = cache;
     this[$evictionThreshold] = evictionThreshold;
   }
