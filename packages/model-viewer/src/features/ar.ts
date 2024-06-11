@@ -341,8 +341,13 @@ configuration or device capabilities');
               arMode = ARMode.WEBXR;
               break;
             }
-            if (value === 'scene-viewer' && IS_SCENEVIEWER_CANDIDATE &&
-                !isSceneViewerBlocked) {
+            if (value === 'scene-viewer' && !isSceneViewerBlocked &&
+                (IS_SCENEVIEWER_CANDIDATE ||
+                 ((navigator as any).userAgentData &&
+                  (navigator as any).userAgentData.getHighEntropyValues &&
+                  (await (navigator as any).userAgentData.getHighEntropyValues([
+                    'formFactor'
+                  ])).formFactor?.includes('XR')))) {
               arMode = ARMode.SCENE_VIEWER;
               break;
             }
@@ -573,7 +578,7 @@ configuration or device capabilities');
 
       await this[$triggerLoad]();
 
-      const {model, shadow} = this[$scene];
+      const {model, shadow, target} = this[$scene];
       if (model == null) {
         return '';
       }
@@ -589,7 +594,16 @@ configuration or device capabilities');
       updateSourceProgress(0.2);
 
       const exporter = new USDZExporter();
-      const arraybuffer = await exporter.parse(model);
+
+      target.remove(model);
+      model.position.copy(target.position);
+      model.updateWorldMatrix(false, true);
+
+      const arraybuffer = await exporter.parseAsync(model);
+
+      model.position.set(0, 0, 0);
+      target.add(model);
+
       const blob = new Blob([arraybuffer], {
         type: 'model/vnd.usdz+zip',
       });
